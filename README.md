@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+# Intro to Redux
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Post lecture code for intro to Redux pt 1 & pt 2
 
-## Available Scripts
+### Message Passing
 
-In the project directory, you can run:
+-   [x] Explain the pattern / technique of message passing
+-   [x] Refactor a component's behavior to use message passing
 
-### `yarn start`
+### Redux
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+-   [x] Install the redux library so it can be used in a project.
+-   [x] Create a `store` in redux with some default `state`.
+-   [x] Create a `reducer` to change `state` based on an `action.type`.
+-   [x] Use `dispatch` to send an `action` to the `store` to make changes to `state`.
+-   [x] Read `state` in the `store`.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### React Redux
 
-### `yarn test`
+-   [x] Install the `react-redux` library so it can be used in a project.
+-   [x] Make the `store` available to their application by using the `Provider` component.
+-   [x] Use `connect` to give components the ability to listen for changes to the `store`.
+-   [x] Use `dispatch` in a React component.
+-   [x] Use `mapStateToProps` to read data from the `state` in the Redux `store`.
+-   [x] Use `mapDispatchToProps`
+-   [x] Rethinking in React with Redux
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+![React State vs. Redux][visual]
 
-### `yarn build`
+[visual]: https://css-tricks.com/wp-content/uploads/2016/03/redux-article-3-03.svg
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### What is Message Passing?
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+"Message passing is a technique for invoking behavior (i.e., running a program) on a computer. In contrast to the traditional technique of calling a program by name, message passing uses an object model to distinguish the general function from the specific implementations. The invoking program sends a message and relies on the object to select and execute the appropriate code." -Wikipedia
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Message passing is built on the idea of centralization of program flow: all program flows pass through **one** central function, which in turn invokes the desired functionality. In order to do this, the central function needs to be told 2 things: **a type** which tells the central function which function to call, and, because functions sometimes need data, **a payload** which contains all of the data needed to run the desired function (usually an object).
 
-### `yarn eject`
+### Vocabulary
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+-   [x] Redux - state management (library) (best) for large programs
+-   [x] store - object that serves as the ultimate source of truth for the app. like a cloud. and has getState and dispatch methods
+-   [x] reducer - case switch that returns the new version of state
+-   [x] getState() - current version of the store. READ
+-   [x] dispatch() - a function that takes an arg of an action and calls the reducer (and updates our store)
+-   [x] action - object that has a key of type and maybe payload and determines the reducer behavior
+-   [x] type - command! a string
+-   [x] payload - data! optional
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### React Redux
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+-   [x] mapStateToProps()
+-   [x] mapDispatchToProps()
+-   [x] Provider
+-   [x] connect()
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Redux setup
 
-## Learn More
+1. Write a `reducer` function
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```js
+// the most basic template of a reducer:
+const defaultState = {
+    // whatever you want
+};
+function reducer(state = defaultState, action) {
+    // remember: WHATEVER is returned from the reducer BECOMES state
+    return state;
+}
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. Create Store
 
-### Code Splitting
+```js
+import { createStore } from "redux";
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+// give the reducer to your store so it can initialize and setup your state
+const store = createStore(reducer);
+```
 
-### Analyzing the Bundle Size
+### Reading and Writing to Redux
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```js
+// read from redux
+store.getStore();
 
-### Making a Progressive Web App
+// write to redux
+store.dispatch({ type: "SOME_TYPE" });
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+`dispatch` takes one argument: a POJO that we call an action. The action must at a minimum have a `type` attribute which will be used to figure out which part of your reducer to call. Any other data that is needed to change state is passed in as an attribute on the action that is called, by convention, `payload`.
 
-### Advanced Configuration
+```js
+store.dispatch({ type: "SOME_TYPE", payload: { data: "my data" } });
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Information Flow
 
-### Deployment
+Everytime `dispatch` is called, the `reducer` is called. The 1st argument is the previous state, the 2nd argument is the `action` object that was passed in when `dispatch` was called. Whatever is returned from `reducer` then **becomes** state (i.e. it does not update state, it completely **overwrites** it)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Additional Resources
 
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+-   [Redux Thunk Walkthrough](https://alligator.io/redux/redux-thunk/)
